@@ -1,0 +1,7 @@
+{
+  "dependencies": {
+    "@types/nanoid": "^3.0.0",
+    "nanoid": "^5.0.4",
+    "parcel": "^2.11.0"
+  }
+}

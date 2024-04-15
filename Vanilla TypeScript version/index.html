@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TO DO</title>
+    <link
+      rel="stylesheet"
+      href="https://cdn.linearicons.com/free/1.0.0/icon-font.min.css"
+    />
+    <link rel="stylesheet" href="css/style.css" />
+    <script type="module" src="build/main.js" defer></script>
+  </head>
+  <body>
+    <div class="wrapper">
+    <section id="high-priority">
+      <div id="error-output"></div>
+      <form id="hp-form">
+        <label class="hp-label" for="hp-input">HIGH<br /></label>
+
+        <input
+          type="text"
+          id="hp-input"
+          name="hp-task"
+          placeholder="Добавить важных дел"
+          class="add-task"
+          required
+        />
+        <button id="hp-button" type="submit" class="lnr lnr-file-add"></button>
+      </form>
+    </section>
+
+    <section id="low-priority">
+      <form id="lp-form">
+        <label class="lp-label" for="lp-input">LOW<br /></label>
+
+        <input
+          type="text"
+          id="lp-input"
+          name="lp-task"
+          placeholder="Добавить дел"
+          class="add-task"
+          required
+        />
+        <button id="lp-button" type="submit" class="lnr lnr-file-add"></button>
+      </form>
+    </section>
+  </div>
+  </body>
+</html>
