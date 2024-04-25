@@ -1,5 +1,4 @@
-import React from 'react';
-import { createContext, useContext, useReducer, Dispatch } from 'react';
+import React, { createContext, useContext, useReducer, Dispatch } from "react";
 
 export type Task = {
   id: string;
@@ -8,45 +7,57 @@ export type Task = {
 };
 
 type Add = Task & {
-  type: 'add';
+  type: "add";
 };
 
 type Changed = {
-  type: 'changed';
+  type: "changed";
   task: Task;
 };
 
 type Checked = {
-  type: 'checked';
+  type: "checked";
   task: Task;
 };
 
 type Delete = {
-  type: 'delete';
+  type: "delete";
   id: string;
 };
 
-const tasks: Task[] = [];
+const tasks: Task[] = localStorage.getItem("storedTasks")
+  ? JSON.parse(localStorage.getItem("storedTasks") as string)
+  : [];
 
 const stateContext = createContext<Task[] | null | undefined>(null);
-const dispatchContext = createContext<Dispatch<Add | Changed | Checked | Delete> | null>(null);
+const dispatchContext = createContext<Dispatch<
+  Add | Changed | Checked | Delete
+> | null>(null);
 
 function reduser(draft: Task[], action: Add | Changed | Checked | Delete) {
   switch (action.type) {
-    case 'add': {
+    case "add": {
       return [...draft, { id: action.id, text: action.text, checked: false }];
     }
-    case 'changed': {
-      const currentState = draft.map(task => (task.id === action.task.id ? action.task : task));
+    case "changed": {
+      const currentState = draft.map((task) =>
+        task.id === action.task.id ? action.task : task
+      );
       return currentState;
     }
-    case 'checked': {
+    case "checked": {
       return action.task.checked
-        ? [{ id: action.task.id, text: action.task.text, checked: true }, ...draft]
-        : [...draft, { id: action.task.id, text: action.task.text, checked: false }];
+        ? [
+            { id: action.task.id, text: action.task.text, checked: true },
+            ...draft,
+          ]
+        : [
+            ...draft,
+            { id: action.task.id, text: action.task.text, checked: false },
+          ];
     }
-    case 'delete': {
-      const currentState = draft.filter(task => task.id !== action.id);
+    case "delete": {
+      const currentState = draft.filter((task) => task.id !== action.id);
       return currentState;
     }
     default:
@@ -59,7 +70,9 @@ function TasksProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <stateContext.Provider value={state}>
-      <dispatchContext.Provider value={dispatch}>{children}</dispatchContext.Provider>
+      <dispatchContext.Provider value={dispatch}>
+        {children}
+      </dispatchContext.Provider>
     </stateContext.Provider>
   );
 }

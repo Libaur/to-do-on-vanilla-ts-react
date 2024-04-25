@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { List } from '@mui/material';
-import { Task } from '../app/context';
-import { TaskItem } from './task-item';
-import { useStateContext, useDispatchContext } from '../app/context';
-import { isPatternPassed } from '../app/utils';
+import React, { useState, useEffect } from "react";
+import { List } from "@mui/material";
+import { Task } from "../app/context";
+import { TaskItem } from "./task-item";
+import { useStateContext, useDispatchContext } from "../app/context";
+import { isPatternPassed } from "../app/utils";
 
 interface OrderedTasks {
   ГОТОВО: Task[];
@@ -12,18 +12,23 @@ interface OrderedTasks {
 
 export function TaskWrapper() {
   const [error, setError] = useState(false);
+  const [forceUpdate, setForceUpdate] = useState(0);
   const tasks = useStateContext() ?? [];
   const dispatch = useDispatchContext();
-  if (!tasks || !dispatch) console.error('context is null from TaskWrapper');
+  if (!tasks || !dispatch) console.error("context is null from TaskWrapper");
 
   const orderedTasks = tasks.reduce(
     (acc: OrderedTasks, task) => {
-      const status = task.checked ? 'ГОТОВО' : 'ПЛАН';
-      status === 'ГОТОВО' ? acc[status].unshift(task) : acc[status].push(task);
+      const status = task.checked ? "ГОТОВО" : "ПЛАН";
+      status === "ГОТОВО" ? acc[status].unshift(task) : acc[status].push(task);
       return acc;
     },
     { ГОТОВО: [], ПЛАН: [] }
   );
+
+  useEffect(() => {
+    localStorage.setItem("storedTasks", JSON.stringify(tasks));
+  }, [forceUpdate]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
@@ -32,20 +37,21 @@ export function TaskWrapper() {
     const text = e.target.value;
     isPatternPassed(text) ? setError(false) : setError(true);
     dispatch?.({
-      type: 'changed',
+      type: "changed",
       task: { ...task, text: text },
     });
+    setForceUpdate((prev) => prev + 1);
   };
 
   return Object.entries(orderedTasks).map(([status, tasks]) => (
     <List
       key={status}
-      subheader={tasks.length ? `${status} (${tasks.length})` : ''}
+      subheader={tasks.length ? `${status} (${tasks.length})` : ""}
       sx={{
-        width: '100%',
-        textAlign: 'center',
-        color: 'GrayText',
-        order: status === 'ПЛАН' ? 1 : 2,
+        width: "100%",
+        textAlign: "center",
+        color: "GrayText",
+        order: status === "ПЛАН" ? 1 : 2,
       }}
     >
       {tasks.map((task: Task) => (
@@ -54,19 +60,21 @@ export function TaskWrapper() {
           text={task.text}
           checked={task.checked}
           error={error}
-          onChecked={e =>
+          onChecked={(e) => {
             dispatch?.({
-              type: 'changed',
+              type: "changed",
               task: { ...task, checked: e.target.checked },
-            })
-          }
-          onChange={e => handleChange(e, task)}
-          onDelete={() =>
+            });
+            setForceUpdate((prev) => prev + 1);
+          }}
+          onChange={(e) => handleChange(e, task)}
+          onDelete={() => {
             dispatch?.({
-              type: 'delete',
+              type: "delete",
               id: task.id,
-            })
-          }
+            });
+            setForceUpdate((prev) => prev + 1);
+          }}
         />
       ))}
     </List>
